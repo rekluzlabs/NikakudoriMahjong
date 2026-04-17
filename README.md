@@ -2,14 +2,12 @@
 
 A beautiful and peaceful Japanese tile-matching solitaire game. Clear the board by matching identical pairs to reveal scenic images of Japan and inspirational proverbs.
 
-## What's New (v5.5.2)
+## What's New (v5.5.5)
 
-- **Pinch-to-Zoom** - Pinch gestures to zoom the game board
-- **Refactored Game Engine** - Better code organization with dedicated use cases
-- **3D Board Improvements** - Fixed tile placement and generation for layered layouts
-- **Welcome Screen** - New animated welcome screen with visual effects
-- **Localization** - Additional language strings (ES, FR, IT, TL)
-- **Bug Fixes** - Various tweaks and improvements to game stability
+Redesigned Board Layouts - Completely reimagined Pyramid, Dragon, and Bridge layouts with more tiles and improved structures
+Enhanced Tile Rendering - Improved visual overlap and spacing for better 3D board aesthetics
+New Languages - Added Traditional Chinese (繁體中文) and Korean (한국어) support
+Fixed GitHub Link - Updated repository URL
 
 ## How to Play
 
