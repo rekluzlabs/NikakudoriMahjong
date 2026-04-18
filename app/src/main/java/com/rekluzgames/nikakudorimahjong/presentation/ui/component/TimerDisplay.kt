@@ -27,7 +27,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.rekluzgames.nikakudorimahjong.domain.model.Difficulty
 import com.rekluzgames.nikakudorimahjong.presentation.viewmodel.GameViewModel
 
 @Composable
@@ -38,7 +37,7 @@ fun TimerDisplay(viewModel: GameViewModel) {
     val targetColor = when {
         seconds < 120  -> Color.White
         seconds < 300  -> Color(0xFFFFB300)
-        else              -> Color(0xFFFF4444)
+        else           -> Color(0xFFFF4444)
     }
     val timerColor by animateColorAsState(targetColor, tween(1000), label = "timerColor")
 
@@ -59,7 +58,7 @@ fun TimerDisplay(viewModel: GameViewModel) {
                         val pressDuration = System.currentTimeMillis() - pressStartTime.longValue
 
                         if (pressDuration >= 3000L) {
-                            viewModel.startNewGame(Difficulty.DEV)
+                            viewModel.openDevMenu()
                         }
                         pressStartTime.longValue = 0L
                     }

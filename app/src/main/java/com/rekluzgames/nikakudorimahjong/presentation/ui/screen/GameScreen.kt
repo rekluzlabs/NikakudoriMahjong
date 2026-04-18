@@ -1,5 +1,7 @@
 /*
  * Copyright (c) 2026 Rekluz Games. All rights reserved.
+ * This code and its assets are the exclusive property of Rekluz Games.
+ * Unauthorized copying, distribution, or commercial use is strictly prohibited.
  */
 
 package com.rekluzgames.nikakudorimahjong.presentation.ui.screen
@@ -48,6 +50,7 @@ fun GameScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val settingsState by settingsViewModel.uiState.collectAsState()
+    val isDevMenuOpen by viewModel.isDevMenuOpen.collectAsState()
     val context = LocalContext.current
     var showLanguageOverlay by remember { mutableStateOf(false) }
     var showQuoteOverlay by remember { mutableStateOf(false) }
@@ -121,9 +124,9 @@ fun GameScreen(
                     }
 
                     // LAYER B: Location Overlay (displays location text on image)
-                    if (uiState.gameState == GameState.WON || 
-                        uiState.gameState == GameState.SCORE || 
-                        uiState.gameState == GameState.SCORE_ENTRY || 
+                    if (uiState.gameState == GameState.WON ||
+                        uiState.gameState == GameState.SCORE ||
+                        uiState.gameState == GameState.SCORE_ENTRY ||
                         uiState.gameState == GameState.QUOTE) {
                         LocationOverlay(backgroundImageName = uiState.backgroundImageName)
                     }
@@ -322,7 +325,19 @@ fun GameScreen(
                 }
             } // End Row
 
-            // Overlays
+            // ===================================================================
+            // DEV MENU OVERLAY
+            // ===================================================================
+            if (isDevMenuOpen) {
+                DevMenu(
+                    gameViewModel = viewModel,
+                    onDismiss = { viewModel.closeDevMenu() }
+                )
+            }
+
+            // ===================================================================
+            // GAME STATE OVERLAYS
+            // ===================================================================
             when (uiState.gameState) {
                 GameState.PAUSED      -> PauseOverlay(viewModel) { (context as? Activity)?.finish() }
                 GameState.BOARDS      -> BoardsOverlay(viewModel)

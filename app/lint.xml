@@ -7,4 +7,7 @@
     <issue id="IconDuplicates" severity="ignore" />
     <issue id="IconXmlAndPng" severity="ignore" />
     <issue id="PluralsCandidate" severity="ignore" />
+    <issue id="UnusedAttribute" severity="ignore" />
+    <issue id="ObsoleteSdk" severity="ignore" />
+    <issue id="TargetSdk" severity="ignore" />
 </lint>

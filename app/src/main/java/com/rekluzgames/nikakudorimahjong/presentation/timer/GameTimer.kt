@@ -1,16 +1,23 @@
+/*
+ * Copyright (c) 2026 Rekluz Games. All rights reserved.
+ * This code and its assets are the exclusive property of Rekluz Games.
+ * Unauthorized copying, distribution, or commercial use is strictly prohibited.
+ */
+
 package com.rekluzgames.nikakudorimahjong.presentation.timer
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class GameTimer @Inject constructor() {
     private val _timeSeconds = MutableStateFlow(0)
-    val timeSeconds = _timeSeconds.asStateFlow()
+    val timeSeconds: StateFlow<Int> = _timeSeconds.asStateFlow()
 
     private var timerJob: Job? = null
 
@@ -32,5 +39,19 @@ class GameTimer @Inject constructor() {
     fun reset() {
         pause()
         _timeSeconds.value = 0
+    }
+
+    // =========================================================================
+    // DEV MENU SUPPORT: Time manipulation
+    // =========================================================================
+
+    fun setTimeRemaining(seconds: Int) {
+        _timeSeconds.value = seconds
+    }
+
+    fun resume(scope: CoroutineScope) {
+        if (timerJob == null || !timerJob!!.isActive) {
+            start(scope)
+        }
     }
 }

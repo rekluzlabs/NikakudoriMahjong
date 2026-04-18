@@ -30,6 +30,7 @@ import com.rekluzgames.nikakudorimahjong.presentation.usecase.InteractionCoordin
 import com.rekluzgames.nikakudorimahjong.presentation.usecase.AutoCompleteUseCase
 import com.rekluzgames.nikakudorimahjong.presentation.usecase.AutoCompleteStep
 import com.rekluzgames.nikakudorimahjong.presentation.usecase.LayeredAutoCompleteStep
+import android.util.Log
 
 @HiltViewModel
 class GameViewModel @Inject constructor(
@@ -64,6 +65,24 @@ class GameViewModel @Inject constructor(
     private var matchLineJob: Job? = null
     private var autoHintJob: Job? = null
     private var lastActivityTime = 0L
+
+    // =========================================================================
+    // DEV MENU STATE & CONTROL
+    // =========================================================================
+
+    private val _isDevMenuOpen = MutableStateFlow(false)
+    val isDevMenuOpen: StateFlow<Boolean> = _isDevMenuOpen.asStateFlow()
+
+    private val _isAutoPlayEnabled = MutableStateFlow(false)
+    val isAutoPlayEnabled: StateFlow<Boolean> = _isAutoPlayEnabled.asStateFlow()
+
+    private val _isInfiniteTimeEnabled = MutableStateFlow(false)
+    val isInfiniteTimeEnabled: StateFlow<Boolean> = _isInfiniteTimeEnabled.asStateFlow()
+
+    private val _isSkipAnimationsEnabled = MutableStateFlow(false)
+    val isSkipAnimationsEnabled: StateFlow<Boolean> = _isSkipAnimationsEnabled.asStateFlow()
+
+    private var autoPlayJob: Job? = null
 
     init {
         _uiState.update {
@@ -165,6 +184,7 @@ class GameViewModel @Inject constructor(
             finalizeStart()
         }
     }
+
     private fun finalizeStart() {
         gameTimer.start(viewModelScope)
         musicManager.start()
@@ -178,7 +198,7 @@ class GameViewModel @Inject constructor(
         hapticManager.gameWin()
 
         _uiState.update {
-            it.copy(gameState = GameState.QUOTE, lastMatchPath = null, lastMatchedPair = null)
+            it.copy(gameState = GameState.QUOTE)
         }
 
         quoteJob = viewModelScope.launch {
@@ -575,6 +595,214 @@ class GameViewModel @Inject constructor(
         _uiState.update {
             it.copy(currentQuote = controller.prepareNewGameState(it.backgroundImageName, it.isLayeredMode).currentQuote)
         }
+    }
+
+    // =========================================================================
+    // DEV MENU METHODS
+    // =========================================================================
+
+    fun openDevMenu() {
+        _isDevMenuOpen.value = true
+    }
+
+    fun closeDevMenu() {
+        _isDevMenuOpen.value = false
+    }
+
+    // =========================================================================
+    // GAME STATE FORCING
+    // =========================================================================
+
+    fun forceState(newState: GameState) {
+        // Handle state transitions with proper cleanup
+        val currentState = _uiState.value.gameState
+
+        when {
+            currentState == GameState.PLAYING && newState != GameState.PLAYING -> {
+                gameTimer.pause()
+                autoHintJob?.cancel()
+            }
+            currentState != GameState.PLAYING && newState == GameState.PLAYING -> {
+                gameTimer.start(viewModelScope)
+                lastActivityTime = System.currentTimeMillis()
+                startAutoHintTimer()
+            }
+        }
+
+        _uiState.update {
+            it.copy(
+                previousState = it.gameState,
+                gameState = newState
+            )
+        }
+
+        Log.d("DevMenu", "Forced state to: $newState")
+    }
+
+    // =========================================================================
+    // AUTO-PLAY - SIMPLIFIED
+    // =========================================================================
+
+    fun toggleAutoPlay() {
+        _isAutoPlayEnabled.value = !_isAutoPlayEnabled.value
+        Log.d("DevMenu", "Auto-play: ${_isAutoPlayEnabled.value}")
+
+        if (_isAutoPlayEnabled.value && _uiState.value.gameState == GameState.PLAYING) {
+            startAutoPlay()
+        } else {
+            autoPlayJob?.cancel()
+        }
+    }
+
+    private fun startAutoPlay() {
+        autoPlayJob?.cancel()
+        autoPlayJob = viewModelScope.launch {
+            while (_isAutoPlayEnabled.value && _uiState.value.gameState == GameState.PLAYING) {
+                delay(800)
+
+                val state = _uiState.value
+
+                if (!state.isLayeredMode) {
+                    // Flat board auto-play
+                    val board = state.board
+                    var foundPair = false
+
+                    outer@ for (r in board.indices) {
+                        for (c in board[r].indices) {
+                            val tile = board[r][c]
+                            if (!tile.isRemoved) {
+                                // Found first tile, click it
+                                handleTileClick(r, c)
+                                delay(400)
+
+                                // Find matching tile with same type
+                                inner@ for (r2 in board.indices) {
+                                    for (c2 in board[r2].indices) {
+                                        val tile2 = board[r2][c2]
+                                        if (!tile2.isRemoved && tile2.type == tile.type && !(r == r2 && c == c2)) {
+                                            handleTileClick(r2, c2)
+                                            delay(400)
+                                            foundPair = true
+                                            break@outer
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (!foundPair) break // No more pairs available
+                } else {
+                    // Layered board auto-play
+                    val tiles = state.layeredTiles.filter { !it.isRemoved }
+                    if (tiles.size >= 2) {
+                        val first = tiles[0]
+                        val matching = tiles.drop(1).firstOrNull { it.type == first.type }
+                        if (matching != null) {
+                            handleLayeredTileClick(first.id)
+                            delay(400)
+                            handleLayeredTileClick(matching.id)
+                            delay(400)
+                        } else {
+                            break // No matching pair found
+                        }
+                    } else {
+                        break // Not enough tiles
+                    }
+                }
+            }
+        }
+    }
+
+    // =========================================================================
+    // TIMER CONTROLS
+    // =========================================================================
+
+    fun toggleInfiniteTime() {
+        _isInfiniteTimeEnabled.value = !_isInfiniteTimeEnabled.value
+        Log.d("DevMenu", "Infinite time: ${_isInfiniteTimeEnabled.value}")
+
+        if (_isInfiniteTimeEnabled.value) {
+            gameTimer.pause()
+        } else {
+            if (_uiState.value.gameState == GameState.PLAYING) {
+                gameTimer.start(viewModelScope)
+            }
+        }
+    }
+
+    fun jumpToTimeRemaining(seconds: Int) {
+        gameTimer.setTimeRemaining(seconds)
+        Log.d("DevMenu", "Jumped to $seconds seconds")
+    }
+
+    // =========================================================================
+    // ANIMATION CONTROLS
+    // =========================================================================
+
+    fun toggleSkipAnimations() {
+        _isSkipAnimationsEnabled.value = !_isSkipAnimationsEnabled.value
+        Log.d("DevMenu", "Skip animations: ${_isSkipAnimationsEnabled.value}")
+    }
+
+    // =========================================================================
+    // BOARD TESTING
+    // =========================================================================
+
+    fun forceUnwinnableBoard() {
+        Log.d("DevMenu", "Resetting board to starting state")
+
+        val state = _uiState.value
+        _uiState.update {
+            it.copy(
+                board = state.originalBoard,
+                gameState = GameState.PLAYING,
+                selectedTile = null
+            )
+        }
+    }
+
+    fun forceAllPairsAvailable() {
+        Log.d("DevMenu", "Removing half the tiles for easy play")
+
+        val state = _uiState.value
+        val newBoard = state.originalBoard.mapIndexed { r, row ->
+            row.mapIndexed { c, tile ->
+                // Remove every other tile to make remaining tiles solvable
+                if ((r + c) % 2 == 0) tile.copy(isRemoved = true) else tile
+            }
+        }
+
+        _uiState.update {
+            it.copy(
+                board = newBoard,
+                gameState = GameState.PLAYING,
+                selectedTile = null
+            )
+        }
+    }
+
+    // =========================================================================
+    // STATE EXPORT FOR DEBUGGING
+    // =========================================================================
+
+    fun exportGameStateToLogs() {
+        val state = _uiState.value
+        val exportData: Map<String, Any> = mapOf(
+            "gameState" to state.gameState.name,
+            "isLayeredMode" to state.isLayeredMode,
+            "difficulty" to state.difficulty.label,
+            "boardRows" to state.board.size,
+            "boardCols" to (state.board.getOrNull(0)?.size ?: 0),
+            "tilesRemaining" to state.board.flatten().count { !it.isRemoved },
+            "totalTiles" to state.board.flatten().size,
+            "timeRemaining" to gameTimer.timeSeconds.value,
+            "usedHint" to state.usedHint,
+            "usedShuffle" to state.usedShuffle,
+            "shufflesRemaining" to state.shufflesRemaining
+        )
+
+        Log.d("DevMenu_State", exportData.toString())
     }
 
     companion object {

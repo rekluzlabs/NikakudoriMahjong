@@ -13,14 +13,14 @@ plugins {
 
 android {
     namespace = "com.rekluzgames.nikakudorimahjong"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.rekluzgames.nikakudorimahjong"
         minSdk = 24
-        targetSdk = 36
-        versionCode = 26041601
-        versionName = "5.5.5"
+        targetSdk = 37
+        versionCode = 26041801
+        versionName = "5.5.7"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -43,6 +43,12 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+
+    lint {
+        disable += "TargetSdk"
+        disable += "ObsoleteSdk"
+        disable += "UnusedAttribute"
     }
 
     packaging {

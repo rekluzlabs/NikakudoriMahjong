@@ -6,6 +6,7 @@
 
 package com.rekluzgames.nikakudorimahjong.presentation.ui.screen
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -13,10 +14,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
@@ -33,8 +36,63 @@ import androidx.compose.ui.res.stringResource
 import com.rekluzgames.nikakudorimahjong.R
 import com.rekluzgames.nikakudorimahjong.BuildConfig
 import kotlinx.coroutines.delay
+import kotlin.math.*
+import kotlin.random.Random
 
 import android.annotation.SuppressLint
+
+// ─── About Petal data ───────────────────────────────────────────────────────────────
+private data class AboutPetal(
+    var x: Float,
+    var y: Float,
+    var vx: Float,
+    var vy: Float,
+    var rotation: Float,
+    var rotSpeed: Float,
+    var alpha: Float,
+    var fade: Float,
+    var size: Float,
+    var scaleX: Float,
+    var wobble: Float,
+    var wobbleSpeed: Float,
+    var color: Color,
+    var depth: Float
+)
+
+private val petalColors = listOf(
+    Color(0xFFFFB7C5), Color(0xFFFF8FAB), Color(0xFFFFC8D6),
+    Color(0xFFFFE4EC), Color(0xFFFF9AB5), Color(0xFFFFD6E0),
+    Color(0xFFFFCCD8)
+)
+
+private const val WINDOW_RIGHT = 0.42f
+private const val WINDOW_TOP = 0.32f
+private const val WINDOW_BOTTOM = 0.72f
+
+private fun randomWindowPetal(): AboutPetal {
+    val depth = Random.nextFloat()
+    val sizeBase = Random.nextFloat() * 6f + 4f
+    return AboutPetal(
+        x = WINDOW_RIGHT - Random.nextFloat() * 0.04f,
+        y = WINDOW_TOP + Random.nextFloat() * (WINDOW_BOTTOM - WINDOW_TOP),
+        vx = if (Random.nextFloat() < 0.6f) {
+            (0.0006f + depth * 0.0010f) + Random.nextFloat() * 0.0005f
+        } else {
+            -((0.0003f + depth * 0.0006f) + Random.nextFloat() * 0.0003f)
+        },
+        vy = Random.nextFloat() * 0.0012f + 0.0004f,
+        rotation = Random.nextFloat() * 360f,
+        rotSpeed = (Random.nextFloat() * 3f) - 1.5f,
+        alpha = 0.3f + depth * 0.65f,
+        fade = Random.nextFloat() * 0.0008f + 0.0004f,
+        size = sizeBase * (0.5f + depth * 0.7f),
+        scaleX = Random.nextFloat() * 0.6f + 0.4f,
+        wobble = Random.nextFloat() * (2f * PI.toFloat()),
+        wobbleSpeed = Random.nextFloat() * 0.025f + 0.008f + depth * 0.01f,
+        color = petalColors.random(),
+        depth = depth
+    )
+}
 
 @SuppressLint("DiscouragedApi", "LocalContextResourcesRead")
 @Composable
@@ -42,40 +100,100 @@ fun AboutScreen(viewModel: GameViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
+    var petals by remember { mutableStateOf<List<AboutPetal>>(emptyList()) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(120)
+            if (petals.size < 80) {
+                petals = petals + randomWindowPetal()
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(16L)
+            petals = petals
+                .map { p ->
+                    val newWobble = p.wobble + p.wobbleSpeed
+                    p.copy(
+                        wobble = newWobble,
+                        x = p.x + p.vx,
+                        y = p.y + p.vy + sin(newWobble) * 0.0008f,
+                        rotation = p.rotation + p.rotSpeed,
+                        alpha = (p.alpha - p.fade).coerceAtLeast(0f)
+                    )
+                }
+                .filter { it.alpha > 0.01f && it.y < 1.05f && it.x < 1.1f && it.x > -0.1f }
+        }
+    }
 
     OverlayContainer {
-        // Outer Box: clips to rounded shape and holds the image background + content
         Box(
             modifier = Modifier
-                .widthIn(max = 620.dp)
-                .fillMaxWidth(0.9f)
-                .fillMaxHeight()
+                .fillMaxWidth(0.95f)
+                .aspectRatio(1.5f)
                 .clip(RoundedCornerShape(24.dp))
                 .border(1.dp, Color(0xFF00BFFF).copy(alpha = 0.15f), RoundedCornerShape(24.dp))
         ) {
-            // ── Background image ──────────────────────────────────────────────
             Image(
                 painter = painterResource(R.drawable.about_bg),
                 contentDescription = null,
-                contentScale = ContentScale.FillWidth,
-                modifier = Modifier.matchParentSize()
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
             )
 
-            // ── Dark scrim — adjust alpha (0.0f = invisible, 1.0f = black) ───
             Box(
                 modifier = Modifier
                     .matchParentSize()
-                    .background(Color.Black.copy(alpha = 0.6f))
+                    .background(Color.Black.copy(alpha = 0.3f))
             )
 
-            // ── Foreground content ────────────────────────────────────────────
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .drawWithContent {
+                        drawContent()
+                        val sorted = petals.sortedBy { it.depth }
+                        for (p in sorted) {
+                            val cx = p.x * size.width
+                            val cy = p.y * size.height
+                            val w = p.size * 2f * p.scaleX
+                            val h = p.size
+
+                            val rad = Math.toRadians(p.rotation.toDouble()).toFloat()
+                            val halfW = w / 2f
+                            val halfH = h / 2f
+
+                            with(drawContext.canvas.nativeCanvas) {
+                                save()
+                                translate(cx, cy)
+                                rotate(Math.toDegrees(rad.toDouble()).toFloat())
+                                drawOval(
+                                    android.graphics.RectF(-halfW, -halfH, halfW, halfH),
+                                    android.graphics.Paint().apply {
+                                        color = android.graphics.Color.argb(
+                                            (p.alpha * 255).toInt(),
+                                            (p.color.red * 255).toInt(),
+                                            (p.color.green * 255).toInt(),
+                                            (p.color.blue * 255).toInt()
+                                        )
+                                        isAntiAlias = true
+                                    }
+                                )
+                                restore()
+                            }
+                        }
+                    }
+            )
+
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Push content toward the bottom
                 Spacer(Modifier.weight(3f))
 
                 when (uiState.aboutStage) {
@@ -85,16 +203,19 @@ fun AboutScreen(viewModel: GameViewModel) {
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // LEFT SIDE: Description and GitHub
                             Column(modifier = Modifier.weight(1.2f).padding(end = 16.dp)) {
                                 Text(
                                     text = stringResource(R.string.how_to_play),
-                                    color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold
+                                    color = Color.White,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
                                 )
                                 Spacer(Modifier.height(8.dp))
                                 Text(
                                     text = stringResource(R.string.about_description),
-                                    color = Color.White, fontSize = 15.sp, lineHeight = 20.sp
+                                    color = Color.White,
+                                    fontSize = 15.sp,
+                                    lineHeight = 20.sp
                                 )
                                 Spacer(Modifier.height(20.dp))
                                 Text(
@@ -113,7 +234,6 @@ fun AboutScreen(viewModel: GameViewModel) {
                                 )
                             }
 
-                            // RIGHT SIDE: The Alphabet Tile Secret
                             Column(
                                 modifier = Modifier.weight(1f),
                                 horizontalAlignment = Alignment.CenterHorizontally
@@ -134,18 +254,20 @@ fun AboutScreen(viewModel: GameViewModel) {
                                 }
                                 Spacer(Modifier.height(24.dp))
                                 Box(modifier = Modifier.width(180.dp)) {
-                                    MenuPillButton(text = stringResource(R.string.btn_done), color = Color(0xFF2A2A2A)) {
+                                    MenuPillButton(
+                                        text = stringResource(R.string.btn_done),
+                                        color = Color(0xFF2A2A2A)
+                                    ) {
                                         viewModel.changeState(GameState.PLAYING)
                                     }
                                 }
                             }
                         }
                     }
+
                     else -> {
-                        // STAGE 2: THE EASTER EGG (Profile View)
                         val scrollState = rememberScrollState()
 
-                        // Auto-peek scroll to hint that content is scrollable
                         LaunchedEffect(Unit) {
                             delay(300)
                             scrollState.animateScrollTo(120)
@@ -160,7 +282,6 @@ fun AboutScreen(viewModel: GameViewModel) {
                                 .padding(vertical = 4.dp)
                                 .verticalScroll(scrollState)
                         ) {
-                            // helloworld placeholder
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -185,7 +306,9 @@ fun AboutScreen(viewModel: GameViewModel) {
                                             painter = painterResource(id),
                                             contentDescription = "Developer Photo",
                                             contentScale = ContentScale.Crop,
-                                            modifier = Modifier.fillMaxSize().clip(CircleShape)
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .clip(CircleShape)
                                         )
                                     }
                                 }
@@ -208,7 +331,10 @@ fun AboutScreen(viewModel: GameViewModel) {
                             Spacer(Modifier.height(8.dp))
 
                             Box(Modifier.width(260.dp)) {
-                                MenuPillButton(stringResource(R.string.about_thank_you), color = Color(0xFF00BFFF)) {
+                                MenuPillButton(
+                                    stringResource(R.string.about_thank_you),
+                                    color = Color(0xFF00BFFF)
+                                ) {
                                     viewModel.closeAbout()
                                     viewModel.changeState(GameState.PLAYING)
                                 }
@@ -217,7 +343,6 @@ fun AboutScreen(viewModel: GameViewModel) {
                     }
                 }
 
-                // Balance the top spacer
                 Spacer(Modifier.weight(1f))
             }
         }

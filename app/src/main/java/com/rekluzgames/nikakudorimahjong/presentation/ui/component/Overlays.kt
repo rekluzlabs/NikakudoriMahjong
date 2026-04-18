@@ -50,7 +50,7 @@ fun OverlayCard(
 ) {
     Box(
         modifier = modifier
-            .widthIn(max = 450.dp)
+            .widthIn(max = 650.dp)
             .fillMaxWidth(0.9f)
             .background(Color(0xFF0D1A3A), RoundedCornerShape(24.dp))
             .border(1.dp, Color(0xFF00BFFF).copy(alpha = 0.15f), RoundedCornerShape(24.dp))

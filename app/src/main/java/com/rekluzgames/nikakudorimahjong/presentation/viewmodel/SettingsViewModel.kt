@@ -23,7 +23,7 @@ data class SettingsUIState(
     val gameMode: GameMode          = GameMode.REGULAR,
     val version: String             = "",
     val isLayeredMode: Boolean      = false,
-    val isZoomEnabled: Boolean      = true
+    val isZoomEnabled: Boolean      = false
 )
 
 @HiltViewModel
@@ -55,7 +55,7 @@ class SettingsViewModel @Inject constructor(
                 isMusicEnabled     = settings.isMusicEnabled,
                 isFullScreen       = settings.isFullScreen,
                 gameMode           = settings.gameMode,
-                isZoomEnabled      = settings.isZoomEnabled
+                isZoomEnabled      = false
             )
         }
         soundManager.isEnabled = settings.isSoundEnabled
