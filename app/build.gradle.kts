@@ -49,6 +49,13 @@ android {
         disable += "TargetSdk"
         disable += "ObsoleteSdk"
         disable += "UnusedAttribute"
+        disable += "UnusedImport"
+        disable += "UnusedSymbol"
+        disable += "KotlinConstant"
+        disable += "RedundantSemicolon"
+        disable += "UnusedLocalVariable"
+        disable += "RedundantHigherOrderFunReference"
+        disable += "DEPRECATION"
     }
 
     packaging {

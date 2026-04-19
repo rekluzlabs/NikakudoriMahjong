@@ -86,9 +86,8 @@ class GameSessionController @Inject constructor(
         if (remaining > 0) delay(remaining)
     }
 
-    // -------------------------------------------------------------------------
-    // Lifecycle: Flat Game
-    // -------------------------------------------------------------------------
+
+
 
     /**
      * Build the initial state for a flat game.
@@ -166,9 +165,8 @@ class GameSessionController @Inject constructor(
         )
     }
 
-    // -------------------------------------------------------------------------
-    // Lifecycle: Layered Game
-    // -------------------------------------------------------------------------
+
+
 
     /**
      * Build the initial state for a layered game.
@@ -250,9 +248,8 @@ class GameSessionController @Inject constructor(
         )
     }
 
-    // -------------------------------------------------------------------------
-    // Lifecycle: Win State
-    // -------------------------------------------------------------------------
+
+
 
     /**
      * Build the state when game is won.

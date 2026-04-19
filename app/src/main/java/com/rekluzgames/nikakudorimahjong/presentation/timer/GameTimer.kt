@@ -41,9 +41,8 @@ class GameTimer @Inject constructor() {
         _timeSeconds.value = 0
     }
 
-    // =========================================================================
-    // DEV MENU SUPPORT: Time manipulation
-    // =========================================================================
+
+
 
     fun setTimeRemaining(seconds: Int) {
         _timeSeconds.value = seconds

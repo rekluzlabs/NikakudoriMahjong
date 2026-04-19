@@ -13,12 +13,9 @@ import com.rekluzgames.nikakudorimahjong.data.audio.MusicManager
 import com.rekluzgames.nikakudorimahjong.data.haptic.HapticManager
 import com.rekluzgames.nikakudorimahjong.domain.engine.*
 import com.rekluzgames.nikakudorimahjong.domain.model.*
-import com.rekluzgames.nikakudorimahjong.domain.rules.HintFinder
-import com.rekluzgames.nikakudorimahjong.domain.rules.LayeredHintFinder
 import com.rekluzgames.nikakudorimahjong.presentation.score.ScoreManager
 import com.rekluzgames.nikakudorimahjong.presentation.timer.GameTimer
 import com.rekluzgames.nikakudorimahjong.presentation.ui.component.AboutInteractionHandler
-import com.rekluzgames.nikakudorimahjong.presentation.ui.component.TileInteractionHandler
 import com.rekluzgames.nikakudorimahjong.presentation.usecase.ShuffleUseCase
 import com.rekluzgames.nikakudorimahjong.presentation.usecase.HintUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -66,9 +63,8 @@ class GameViewModel @Inject constructor(
     private var autoHintJob: Job? = null
     private var lastActivityTime = 0L
 
-    // =========================================================================
-    // DEV MENU STATE & CONTROL
-    // =========================================================================
+
+
 
     private val _isDevMenuOpen = MutableStateFlow(false)
     val isDevMenuOpen: StateFlow<Boolean> = _isDevMenuOpen.asStateFlow()
@@ -93,9 +89,8 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Navigation & State Modifiers
-    // -------------------------------------------------------------------------
+
+
 
     fun changeState(newState: GameState) {
         _uiState.update {
@@ -122,10 +117,6 @@ class GameViewModel @Inject constructor(
 
     fun startFromWelcome() = startNewGame(Difficulty.NORMAL)
 
-    fun recordActivity() {
-        lastActivityTime = System.currentTimeMillis()
-    }
-
     private fun startAutoHintTimer() {
         autoHintJob?.cancel()
         autoHintJob = viewModelScope.launch {
@@ -142,9 +133,8 @@ class GameViewModel @Inject constructor(
         startAutoHintTimer()
     }
 
-    // -------------------------------------------------------------------------
-    // Core Game Flow
-    // -------------------------------------------------------------------------
+
+
 
     fun startNewGame(diff: Difficulty) {
         cancelActiveJobs()
@@ -220,9 +210,8 @@ class GameViewModel @Inject constructor(
         matchLineJob?.cancel()
     }
 
-    // -------------------------------------------------------------------------
-    // Tile Interaction — Flat Mode
-    // -------------------------------------------------------------------------
+
+
 
     fun handleTileClick(r: Int, c: Int) {
         resetAutoHintTimer()
@@ -255,9 +244,8 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Tile Interaction — Layered Mode
-    // -------------------------------------------------------------------------
+
+
 
     fun handleLayeredTileClick(id: Int) {
         resetAutoHintTimer()
@@ -294,9 +282,8 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Score & Settings Logic
-    // -------------------------------------------------------------------------
+
+
 
     fun selectScoreTab(tab: String) { _uiState.update { it.copy(selectedScoreTab = tab) } }
     fun updatePlayerName(input: String) { _uiState.update { it.copy(playerName = input.trim().take(3)) } }
@@ -304,7 +291,7 @@ class GameViewModel @Inject constructor(
     fun saveScoreAndShowBoard() {
         val state = _uiState.value
         val difficulty = if (state.isLayeredMode) state.currentLayeredLayout?.difficulty ?: Difficulty.NORMAL else state.difficulty
-        // Map DEV to EASY for score saving since DEV isn't displayed in the scoreboard
+
         val scoreDifficulty = if (difficulty == Difficulty.DEV) Difficulty.EASY else difficulty
         val newScore = scoreManager.processWin(state.playerName, gameTimer.timeSeconds.value, scoreDifficulty, state.usedHint, state.usedShuffle)
 
@@ -325,9 +312,8 @@ class GameViewModel @Inject constructor(
 
     fun clearLastSavedScore() { _uiState.update { it.copy(lastSavedScore = null) } }
 
-    // -------------------------------------------------------------------------
-    // 3D / Layered Game
-    // -------------------------------------------------------------------------
+
+
 
     fun startNewLayeredGame(layout: LayeredLayout) {
         cancelActiveJobs()
@@ -418,9 +404,8 @@ class GameViewModel @Inject constructor(
         finalizeStart()
     }
 
-    // -------------------------------------------------------------------------
-    // Shuffle
-    // -------------------------------------------------------------------------
+
+
 
     fun shuffle() {
         resetAutoHintTimer()
@@ -440,9 +425,8 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Undo
-    // -------------------------------------------------------------------------
+
+
 
     fun undo() {
         resetAutoHintTimer()
@@ -460,9 +444,8 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Hint
-    // -------------------------------------------------------------------------
+
+
 
     fun getHint() {
         val state = _uiState.value
@@ -544,9 +527,8 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Settings
-    // -------------------------------------------------------------------------
+
+
 
     fun applySettingsAndResume(
         modeChanged: Boolean,
@@ -575,9 +557,8 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    // -------------------------------------------------------------------------
-    // About Screen
-    // -------------------------------------------------------------------------
+
+
 
     fun onAboutTileClick(index: Int, threshold: Int) {
         _uiState.update { aboutHandler.onTileClick(it, index, threshold) }
@@ -587,9 +568,8 @@ class GameViewModel @Inject constructor(
         _uiState.update { aboutHandler.close(it) }
     }
 
-    // -------------------------------------------------------------------------
-    // Quote
-    // -------------------------------------------------------------------------
+
+
 
     fun refreshQuote() {
         _uiState.update {
@@ -597,9 +577,8 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    // =========================================================================
-    // DEV MENU METHODS
-    // =========================================================================
+
+
 
     fun openDevMenu() {
         _isDevMenuOpen.value = true
@@ -609,12 +588,11 @@ class GameViewModel @Inject constructor(
         _isDevMenuOpen.value = false
     }
 
-    // =========================================================================
-    // GAME STATE FORCING
-    // =========================================================================
+
+
 
     fun forceState(newState: GameState) {
-        // Handle state transitions with proper cleanup
+
         val currentState = _uiState.value.gameState
 
         when {
@@ -639,9 +617,8 @@ class GameViewModel @Inject constructor(
         Log.d("DevMenu", "Forced state to: $newState")
     }
 
-    // =========================================================================
-    // AUTO-PLAY - SIMPLIFIED
-    // =========================================================================
+
+
 
     fun toggleAutoPlay() {
         _isAutoPlayEnabled.value = !_isAutoPlayEnabled.value
@@ -663,7 +640,7 @@ class GameViewModel @Inject constructor(
                 val state = _uiState.value
 
                 if (!state.isLayeredMode) {
-                    // Flat board auto-play
+
                     val board = state.board
                     var foundPair = false
 
@@ -671,11 +648,10 @@ class GameViewModel @Inject constructor(
                         for (c in board[r].indices) {
                             val tile = board[r][c]
                             if (!tile.isRemoved) {
-                                // Found first tile, click it
+
                                 handleTileClick(r, c)
                                 delay(400)
 
-                                // Find matching tile with same type
                                 inner@ for (r2 in board.indices) {
                                     for (c2 in board[r2].indices) {
                                         val tile2 = board[r2][c2]
@@ -691,9 +667,9 @@ class GameViewModel @Inject constructor(
                         }
                     }
 
-                    if (!foundPair) break // No more pairs available
+                    if (!foundPair) break
                 } else {
-                    // Layered board auto-play
+
                     val tiles = state.layeredTiles.filter { !it.isRemoved }
                     if (tiles.size >= 2) {
                         val first = tiles[0]
@@ -704,19 +680,18 @@ class GameViewModel @Inject constructor(
                             handleLayeredTileClick(matching.id)
                             delay(400)
                         } else {
-                            break // No matching pair found
+                            break
                         }
                     } else {
-                        break // Not enough tiles
+                        break
                     }
                 }
             }
         }
     }
 
-    // =========================================================================
-    // TIMER CONTROLS
-    // =========================================================================
+
+
 
     fun toggleInfiniteTime() {
         _isInfiniteTimeEnabled.value = !_isInfiniteTimeEnabled.value
@@ -736,18 +711,16 @@ class GameViewModel @Inject constructor(
         Log.d("DevMenu", "Jumped to $seconds seconds")
     }
 
-    // =========================================================================
-    // ANIMATION CONTROLS
-    // =========================================================================
+
+
 
     fun toggleSkipAnimations() {
         _isSkipAnimationsEnabled.value = !_isSkipAnimationsEnabled.value
         Log.d("DevMenu", "Skip animations: ${_isSkipAnimationsEnabled.value}")
     }
 
-    // =========================================================================
-    // BOARD TESTING
-    // =========================================================================
+
+
 
     fun forceUnwinnableBoard() {
         Log.d("DevMenu", "Resetting board to starting state")
@@ -768,7 +741,7 @@ class GameViewModel @Inject constructor(
         val state = _uiState.value
         val newBoard = state.originalBoard.mapIndexed { r, row ->
             row.mapIndexed { c, tile ->
-                // Remove every other tile to make remaining tiles solvable
+
                 if ((r + c) % 2 == 0) tile.copy(isRemoved = true) else tile
             }
         }
@@ -782,9 +755,8 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    // =========================================================================
-    // STATE EXPORT FOR DEBUGGING
-    // =========================================================================
+
+
 
     fun exportGameStateToLogs() {
         val state = _uiState.value
@@ -809,6 +781,6 @@ class GameViewModel @Inject constructor(
         const val BOARD_GRAVITY_ANIMATION_DELAY_MS = 100L
         const val HANDLE_WIN_ANIMATION_DELAY_MS = 500L
         private const val AUTO_COMPLETE_DELAY_MS = 700L
-        private const val AUTO_HINT_DELAY_MS = 15000L // 15 seconds
+        private const val AUTO_HINT_DELAY_MS = 15000L
     }
 }

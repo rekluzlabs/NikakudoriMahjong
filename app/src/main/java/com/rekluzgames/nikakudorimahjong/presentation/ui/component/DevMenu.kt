@@ -63,7 +63,7 @@ fun DevMenu(
                     .padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Header
+
                 Text(
                     "⚙️ SECRET DEV MENU",
                     color = Color(0xFF00FF00),
@@ -79,7 +79,6 @@ fun DevMenu(
 
                 HorizontalDivider(color = Color(0xFF333333), thickness = 1.dp)
 
-                // QUICK GAME MODES
                 Text(
                     "🎮 QUICK GAME MODES",
                     color = Color(0xFFFFB300),
@@ -105,7 +104,6 @@ fun DevMenu(
 
                 HorizontalDivider(color = Color(0xFF333333), thickness = 1.dp)
 
-                // GAME STATE JUMPING
                 Text(
                     "⏩ FORCE STATE TRANSITIONS",
                     color = Color(0xFFFFB300),
@@ -139,7 +137,6 @@ fun DevMenu(
 
                 HorizontalDivider(color = Color(0xFF333333), thickness = 1.dp)
 
-                // AUTO-PLAY
                 Text(
                     "🤖 AUTO-PLAY",
                     color = Color(0xFFFFB300),
@@ -155,7 +152,6 @@ fun DevMenu(
 
                 HorizontalDivider(color = Color(0xFF333333), thickness = 1.dp)
 
-                // TIMER CONTROLS
                 Text(
                     "⏱️ TIMER CONTROLS",
                     color = Color(0xFFFFB300),
@@ -181,7 +177,6 @@ fun DevMenu(
 
                 HorizontalDivider(color = Color(0xFF333333), thickness = 1.dp)
 
-                // UI & ANIMATION
                 Text(
                     "🎨 UI & ANIMATION",
                     color = Color(0xFFFFB300),
@@ -197,7 +192,6 @@ fun DevMenu(
 
                 HorizontalDivider(color = Color(0xFF333333), thickness = 1.dp)
 
-                // UTILITIES
                 Text(
                     "🔧 UTILITIES",
                     color = Color(0xFFFFB300),
@@ -230,7 +224,6 @@ fun DevMenu(
 
                 HorizontalDivider(color = Color(0xFF333333), thickness = 1.dp)
 
-                // CLOSE BUTTON
                 DevMenuButton(
                     label = "CLOSE MENU",
                     backgroundColor = Color(0xFF2B2B2B),

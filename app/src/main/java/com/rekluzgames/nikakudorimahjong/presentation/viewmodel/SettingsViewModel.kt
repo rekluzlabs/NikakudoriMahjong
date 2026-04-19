@@ -84,7 +84,12 @@ class SettingsViewModel @Inject constructor(
     fun updateMusicEnabled(enabled: Boolean) {
         repository.setMusicEnabled(enabled)
         musicManager.isEnabled = enabled
-        if (enabled) musicManager.resume() else musicManager.pause()
+        if (enabled) {
+            if (!musicManager.isInitialized) musicManager.start()
+            else musicManager.resume()
+        } else {
+            musicManager.pause()
+        }
         _uiState.update { it.copy(isMusicEnabled = enabled) }
     }
 

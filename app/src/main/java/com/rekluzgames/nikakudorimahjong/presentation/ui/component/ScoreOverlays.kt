@@ -75,11 +75,10 @@ fun ScoreboardOverlay(viewModel: GameViewModel) {
     LaunchedEffect(activeTab) { isConfirmingClear = false }
 
     OverlayContainer {
-        // Added a fixed height constraint to the OverlayCard to ensure it stays within screen bounds
+
         OverlayCard(modifier = Modifier.fillMaxHeight(0.85f).widthIn(max = 450.dp)) {
             OverlayTitle(stringResource(R.string.title_hall_of_fame))
 
-            // Tab Header
             Row(modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
                 Difficulty.entries.filter { it.titleRes > 0 }.forEach { diff ->
                     val isSelected = activeTab == diff.label
@@ -95,9 +94,8 @@ fun ScoreboardOverlay(viewModel: GameViewModel) {
 
             val scores = uiState.highScores[activeTab] ?: emptyList()
 
-            // --- SCROLLABLE SECTION ---
-            // .weight(1f) ensures this section expands to fill available space,
-            // while .verticalScroll keeps it from pushing the footer off-screen.
+
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -127,8 +125,7 @@ fun ScoreboardOverlay(viewModel: GameViewModel) {
                 }
             }
 
-            // --- FIXED FOOTER ---
-            // This stays at the bottom of the OverlayCard regardless of score count.
+
             Spacer(Modifier.height(16.dp))
 
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {

@@ -63,7 +63,7 @@ class PreferenceManager(context: Context) {
 
     fun getHighScores(difficulty: String): Set<String> =
         prefs.getStringSet(Keys.scoreKey(difficulty), emptySet())
-            ?.toSet() ?: emptySet() // IMPORTANT: return a copy
+            ?.toSet() ?: emptySet()
 
     fun saveHighScores(difficulty: String, scores: Set<String>) =
         prefs.edit { putStringSet(Keys.scoreKey(difficulty), scores) }

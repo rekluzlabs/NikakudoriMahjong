@@ -5,9 +5,8 @@ import java.util.BitSet
 
 object PathFinder {
 
-    // =========================
-    // PUBLIC API (RESTORED)
-    // =========================
+
+
 
     fun canConnect(
         p1: Pair<Int, Int>,
@@ -35,12 +34,10 @@ object PathFinder {
 
         if (board[r1][c1].type != board[r2][c2].type) return null
 
-        // Straight
         if (lineClearBoard(r1, c1, r2, c2, board)) {
             return listOf(p1, p2)
         }
 
-        // 1 turn
         if (isPassable(r1, c2, board) &&
             lineClearBoard(r1, c1, r1, c2, board) &&
             lineClearBoard(r1, c2, r2, c2, board)
@@ -54,7 +51,6 @@ object PathFinder {
         val rows = board.size
         val cols = board[0].size
 
-        // 2 turns (rows)
         for (r in -1..rows) {
             if (isPassable(r, c1, board) &&
                 isPassable(r, c2, board) &&
@@ -66,7 +62,6 @@ object PathFinder {
             }
         }
 
-        // 2 turns (cols)
         for (c in -1..cols) {
             if (isPassable(r1, c, board) &&
                 isPassable(r2, c, board) &&
@@ -81,9 +76,8 @@ object PathFinder {
         return null
     }
 
-    // =========================
-    // FAST VERSION (GENERATOR)
-    // =========================
+
+
 
     fun canConnectFast(
         r1: Int, c1: Int,
@@ -160,9 +154,8 @@ object PathFinder {
         return false
     }
 
-    // =========================
-    // INTERNAL (LIST VERSION)
-    // =========================
+
+
 
     private fun canConnectInternal(
         r1: Int, c1: Int,
@@ -212,9 +205,8 @@ object PathFinder {
         return board[r][c].isRemoved
     }
 
-    // =========================
-    // GENERIC lineClear (DRY)
-    // =========================
+
+
 
     private fun lineClear(
         r1: Int, c1: Int,

@@ -28,7 +28,7 @@ data class HighScore(
                 } else emptyList()
                 HighScore(p[1], p[2].toInt(), p[3], m)
             } else {
-                // Legacy support for non-v1 strings
+
                 HighScore(p[0], p[1].toInt(), p[2], emptyList())
             }
         } catch (e: Exception) { null }

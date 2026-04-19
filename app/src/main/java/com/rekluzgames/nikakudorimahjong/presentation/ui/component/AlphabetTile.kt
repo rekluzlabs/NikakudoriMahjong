@@ -29,7 +29,7 @@ fun AlphabetTile(char: Char, isVisible: Boolean, onClick: () -> Unit) {
         }
         Box(
             modifier = Modifier
-                .size(width = 38.dp, height = 50.dp) // Maintain Mahjong aspect ratio
+                .size(width = 38.dp, height = 50.dp)
                 .padding(1.dp)
                 .clickable { onClick() }
         ) {
@@ -43,7 +43,7 @@ fun AlphabetTile(char: Char, isVisible: Boolean, onClick: () -> Unit) {
             }
         }
     } else {
-        // Keeps the layout stable when tiles are cleared
+
         Spacer(Modifier.size(width = 38.dp, height = 50.dp).padding(1.dp))
     }
 }

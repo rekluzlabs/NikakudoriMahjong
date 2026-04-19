@@ -15,7 +15,6 @@ class LayeredGameEngine @Inject constructor() {
     fun isFree(tile: LayeredTile, all: List<LayeredTile>): Boolean {
         if (tile.isRemoved) return false
 
-        // FIX: Check ALL layers above (other.layer > tile.layer)
         val blockedFromAbove = all.any { other ->
             !other.isRemoved &&
                     other.layer > tile.layer &&
@@ -24,7 +23,6 @@ class LayeredGameEngine @Inject constructor() {
         }
         if (blockedFromAbove) return false
 
-        // Standard Mahjong: Must have at least one horizontal side free
         val blockedLeft = all.any { other ->
             !other.isRemoved &&
                     other.layer == tile.layer &&

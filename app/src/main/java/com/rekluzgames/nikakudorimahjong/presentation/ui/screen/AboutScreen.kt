@@ -6,7 +6,6 @@
 
 package com.rekluzgames.nikakudorimahjong.presentation.ui.screen
 
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -18,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -41,7 +39,6 @@ import kotlin.random.Random
 
 import android.annotation.SuppressLint
 
-// ─── About Petal data ───────────────────────────────────────────────────────────────
 private data class AboutPetal(
     var x: Float,
     var y: Float,
@@ -65,32 +62,49 @@ private val petalColors = listOf(
     Color(0xFFFFCCD8)
 )
 
-private const val WINDOW_RIGHT = 0.42f
-private const val WINDOW_TOP = 0.32f
-private const val WINDOW_BOTTOM = 0.72f
-
 private fun randomWindowPetal(): AboutPetal {
     val depth = Random.nextFloat()
     val sizeBase = Random.nextFloat() * 6f + 4f
+
+    // 25% of petals will be "heavy" and reach the bottom of the card
+    val isHeavy = Random.nextFloat() > 0.75f
+
     return AboutPetal(
-        x = WINDOW_RIGHT - Random.nextFloat() * 0.04f,
-        y = WINDOW_TOP + Random.nextFloat() * (WINDOW_BOTTOM - WINDOW_TOP),
-        vx = if (Random.nextFloat() < 0.6f) {
+        // Aligned to the narrow window opening
+        x           = 0.22f + Random.nextFloat() * 0.15f,
+        y           = 0.35f + Random.nextFloat() * 0.10f,
+
+        // Mostly rightward drift
+        vx          = if (Random.nextFloat() < 0.8f) {
             (0.0006f + depth * 0.0010f) + Random.nextFloat() * 0.0005f
         } else {
             -((0.0003f + depth * 0.0006f) + Random.nextFloat() * 0.0003f)
         },
-        vy = Random.nextFloat() * 0.0012f + 0.0004f,
-        rotation = Random.nextFloat() * 360f,
-        rotSpeed = (Random.nextFloat() * 3f) - 1.5f,
-        alpha = 0.3f + depth * 0.65f,
-        fade = Random.nextFloat() * 0.0008f + 0.0004f,
-        size = sizeBase * (0.5f + depth * 0.7f),
-        scaleX = Random.nextFloat() * 0.6f + 0.4f,
-        wobble = Random.nextFloat() * (2f * PI.toFloat()),
+
+        // Heavy petals fall faster; Light petals drift gently
+        vy          = if (isHeavy) {
+            Random.nextFloat() * 0.0025f + 0.0020f
+        } else {
+            Random.nextFloat() * 0.0010f + 0.0004f
+        },
+
+        rotation    = Random.nextFloat() * 360f,
+        rotSpeed    = (Random.nextFloat() * 3f) - 1.5f,
+        alpha       = 0.5f + depth * 0.5f,
+
+        // Heavy petals stay visible longer to complete the journey
+        fade        = if (isHeavy) {
+            Random.nextFloat() * 0.0002f + 0.0001f
+        } else {
+            Random.nextFloat() * 0.0008f + 0.0004f
+        },
+
+        size        = sizeBase * (0.5f + depth * 0.7f),
+        scaleX      = Random.nextFloat() * 0.6f + 0.4f,
+        wobble      = Random.nextFloat() * (2f * PI.toFloat()),
         wobbleSpeed = Random.nextFloat() * 0.025f + 0.008f + depth * 0.01f,
-        color = petalColors.random(),
-        depth = depth
+        color       = petalColors.random(),
+        depth       = depth
     )
 }
 

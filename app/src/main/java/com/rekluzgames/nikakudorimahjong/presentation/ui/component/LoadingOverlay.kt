@@ -31,7 +31,7 @@ fun LoadingOverlay() {
             .background(MidnightBlue),
         contentAlignment = Alignment.Center
     ) {
-        // Full screen welcome image
+
         Image(
             painter = painterResource(R.drawable.welcome_screen),
             contentDescription = null,
@@ -39,14 +39,12 @@ fun LoadingOverlay() {
             modifier = Modifier.fillMaxSize()
         )
 
-        // Semi-transparent scrim so the spinner and text are readable
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black.copy(alpha = 0.35f))
         )
 
-        // Spinner and loading text pinned to the bottom
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)

@@ -26,8 +26,7 @@ import com.rekluzgames.nikakudorimahjong.presentation.viewmodel.GameViewModel
 fun QuoteOverlay(viewModel: GameViewModel) {
     val uiState by viewModel.uiState.collectAsState()
 
-    // Fade the quote in after a short pause so the background
-    // has a moment to breathe before the text appears.
+
     var quoteVisible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         kotlinx.coroutines.delay(800L)
@@ -40,14 +39,13 @@ fun QuoteOverlay(viewModel: GameViewModel) {
         label = "quoteAlpha"
     )
 
-    // Full screen tap area — tapping anywhere skips the 5 second wait
     Box(
         modifier = Modifier
             .fillMaxSize()
             .clickable { viewModel.dismissQuote() },
         contentAlignment = Alignment.Center
     ) {
-        // Minimal quote card — dark background, no heavy border
+
         Column(
             modifier = Modifier
                 .alpha(quoteAlpha)

@@ -18,9 +18,8 @@ import kotlinx.coroutines.isActive
 import kotlin.math.cos
 import kotlin.math.sin
 
-// ─────────────────────────────────────────────────────────────
-// NEW: Mode control (keeps old behavior intact)
-// ─────────────────────────────────────────────────────────────
+
+
 enum class ParticleMode {
     FALLING,
     DIRECTIONAL,
@@ -29,7 +28,6 @@ enum class ParticleMode {
 
 enum class SpawnSide { LEFT, RIGHT }
 
-// ─────────────────────────────────────────────────────────────
 
 data class PetalParticle(
     val x: Float,
@@ -64,9 +62,8 @@ private fun PetalParticle.step(): PetalParticle {
     )
 }
 
-// ─────────────────────────────────────────────────────────────
-// Colors
-// ─────────────────────────────────────────────────────────────
+
+
 private val petalColors = listOf(
     Color(0xFFFFB7C5), Color(0xFFFFC0CB), Color(0xFFFAE1DD), Color(0xFFFFD1DC)
 )
@@ -80,9 +77,8 @@ private val burstColors = listOf(
     Color(0xFFFF8C00),
 )
 
-// ─────────────────────────────────────────────────────────────
-// RESTORED: Burst system (fixes your error)
-// ─────────────────────────────────────────────────────────────
+
+
 private fun spawnBurst(pos: Offset, count: Int = 18): List<PetalParticle> {
     val angleStep = 360f / count
     return List(count) { i ->
@@ -109,7 +105,6 @@ private fun spawnBurst(pos: Offset, count: Int = 18): List<PetalParticle> {
     }
 }
 
-// ─────────────────────────────────────────────────────────────
 
 @Composable
 fun ParticleOverlay(
@@ -124,7 +119,6 @@ fun ParticleOverlay(
     var particles by remember { mutableStateOf<List<PetalParticle>>(emptyList()) }
     var canvasSize by remember { mutableStateOf(Size.Zero) }
 
-    // Physics loop
     LaunchedEffect(Unit) {
         while (isActive) {
             withFrameMillis {
@@ -135,7 +129,6 @@ fun ParticleOverlay(
         }
     }
 
-    // ── Burst (restored)
     LaunchedEffect(selectionPositions) {
         if (selectionPositions.isNotEmpty()) {
             delay(150)
@@ -144,7 +137,6 @@ fun ParticleOverlay(
         }
     }
 
-    // ── Spawn system (mode-based)
     LaunchedEffect(triggerVictoryStorm, mode, spawnSide) {
         if (!triggerVictoryStorm) return@LaunchedEffect
 

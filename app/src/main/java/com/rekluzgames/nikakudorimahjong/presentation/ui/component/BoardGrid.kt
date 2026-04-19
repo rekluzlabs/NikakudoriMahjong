@@ -253,13 +253,11 @@ private fun LayeredBoardGrid(
         val gridWidth  = (maxCol * halfStep) + tileWidth + maxLayer * layerOffsetX
         val gridHeight = (maxRow * halfStepH) + tileHeight + maxLayer * layerOffsetY
 
-        // Inside LayeredBoardGrid function in BoardGrid.kt
 
         val freeTileIds: Set<Int> = remember(tiles) {
             tiles.filter { tile ->
                 if (tile.isRemoved) return@filter false
 
-                // FIX: Check if covered from ANY layer above (o.layer > tile.layer)
                 val blockedAbove = tiles.any { o ->
                     !o.isRemoved &&
                             o.layer > tile.layer &&
@@ -268,7 +266,6 @@ private fun LayeredBoardGrid(
                 }
                 if (blockedAbove) return@filter false
 
-                // Check horizontal blocking (standard rules)
                 val blockedLeft = tiles.any { o ->
                     !o.isRemoved && o.layer == tile.layer &&
                             o.col == tile.col - 2 && abs(o.row - tile.row) < 2

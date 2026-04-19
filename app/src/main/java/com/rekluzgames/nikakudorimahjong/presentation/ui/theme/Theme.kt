@@ -21,7 +21,7 @@ private val DarkColorScheme = darkColorScheme(
 fun NikakudoriTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = DarkColorScheme,
-        typography = Typography, // Ensure Type.kt is present
+        typography = Typography,
         content = content
     )
 }

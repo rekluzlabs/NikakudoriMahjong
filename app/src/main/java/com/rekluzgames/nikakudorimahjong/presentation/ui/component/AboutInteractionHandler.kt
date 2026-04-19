@@ -2,7 +2,7 @@ package com.rekluzgames.nikakudorimahjong.presentation.ui.component
 
 import com.rekluzgames.nikakudorimahjong.data.audio.SoundManager
 import com.rekluzgames.nikakudorimahjong.data.haptic.HapticManager
-import com.rekluzgames.nikakudorimahjong.domain.model.GameUIState  // ← adjust if GameUIState lives elsewhere
+import com.rekluzgames.nikakudorimahjong.domain.model.GameUIState
 
 class AboutInteractionHandler(
     private val soundManager: SoundManager,

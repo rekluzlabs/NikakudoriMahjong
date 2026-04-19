@@ -184,7 +184,6 @@ fun LanguageOverlay(onSelect: (String) -> Unit, onClose: () -> Unit) {
         OverlayCard {
             OverlayTitle(stringResource(R.string.btn_language))
 
-            // 2x2x2 grid — eight languages in four rows
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally

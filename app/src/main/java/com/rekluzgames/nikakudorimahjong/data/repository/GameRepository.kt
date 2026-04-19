@@ -15,13 +15,12 @@ import javax.inject.Singleton
 class GameRepository @Inject constructor(
     private val prefs: PreferenceManager
 ) {
-    // Settings reads
+
     fun isVibrationEnabled() = prefs.isVibrationEnabled()
     fun isMusicEnabled()     = prefs.isMusicEnabled()
     fun getLanguage()        = prefs.getLanguage()
     fun getGameMode()        = prefs.getGameMode()
 
-    // Settings writes
     fun setSoundEnabled(v: Boolean)    = prefs.setSoundEnabled(v)
     fun setVibrationEnabled(v: Boolean) = prefs.setVibrationEnabled(v)
     fun setMusicEnabled(v: Boolean)    = prefs.setMusicEnabled(v)

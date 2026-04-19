@@ -19,7 +19,7 @@ import javax.inject.Inject
 data class FlatInteractionResult(
     val newState: GameUIState,
     val soundToPlay: String? = null,
-    val hapticFeedback: String? = null,  // "select", "match", or "error"
+    val hapticFeedback: String? = null,
     val matchPath: List<Pair<Int, Int>>? = null,
     val matchedPair: Pair<Pair<Int, Int>, Pair<Int, Int>>? = null,
     val matchedBoard: List<List<Tile>>? = null
@@ -32,7 +32,7 @@ data class FlatInteractionResult(
 data class LayeredInteractionResult(
     val newState: GameUIState,
     val soundToPlay: String? = null,
-    val hapticFeedback: String? = null,  // "select", "match", or "error"
+    val hapticFeedback: String? = null,
     val shouldCheckWin: Boolean = false,
     val shouldCheckStalemate: Boolean = false
 )
@@ -51,17 +51,15 @@ class InteractionCoordinator @Inject constructor(
         c: Int,
         state: GameUIState
     ): FlatInteractionResult {
-        // Step 1: Get handler result (contains state update + match info)
+
         val result = tileHandler.handleClick(state, r, c)
 
-        // Step 2: Determine haptic feedback
         val hapticFeedback = when (result.playSound) {
             "tile_error" -> "error"
             "tile_match" -> "match"
-            else -> "select"  // For any other case
+            else -> "select"
         }
 
-        // Step 3: Extract match line info if available
         val (matchPath, matchedPair) = if (result.matchPath != null && result.matchedPair != null) {
             result.matchPath to result.matchedPair
         } else if (result.matchPath != null) {
@@ -94,7 +92,7 @@ class InteractionCoordinator @Inject constructor(
         id: Int,
         state: GameUIState
     ): LayeredInteractionResult {
-        // Step 1: Find the tapped tile
+
         val tapped = state.layeredTiles.firstOrNull { it.id == id && !it.isRemoved }
             ?: return LayeredInteractionResult(
                 newState = state,
@@ -102,7 +100,6 @@ class InteractionCoordinator @Inject constructor(
                 hapticFeedback = null
             )
 
-        // Step 2: Check if tile is free
         if (!layeredEngine.isFree(tapped, state.layeredTiles)) {
             return LayeredInteractionResult(
                 newState = state,
@@ -111,10 +108,9 @@ class InteractionCoordinator @Inject constructor(
             )
         }
 
-        // Step 3: Handle selection/match logic
         return when (state.selectedLayeredTileId) {
             id -> {
-                // Deselect
+
                 LayeredInteractionResult(
                     newState = state.copy(selectedLayeredTileId = null),
                     soundToPlay = null,
@@ -122,7 +118,7 @@ class InteractionCoordinator @Inject constructor(
                 )
             }
             null -> {
-                // Select
+
                 LayeredInteractionResult(
                     newState = state.copy(selectedLayeredTileId = id),
                     soundToPlay = null,
@@ -130,7 +126,7 @@ class InteractionCoordinator @Inject constructor(
                 )
             }
             else -> {
-                // Attempt match
+
                 val newTiles = layeredEngine.attemptMatch(
                     state.selectedLayeredTileId,
                     id,
@@ -138,7 +134,7 @@ class InteractionCoordinator @Inject constructor(
                 )
 
                 if (newTiles != null) {
-                    // Match succeeded
+
                     val snapshot = state.layeredTiles
                     LayeredInteractionResult(
                         newState = state.copy(
@@ -154,7 +150,7 @@ class InteractionCoordinator @Inject constructor(
                         shouldCheckStalemate = true
                     )
                 } else {
-                    // Match failed, select this tile instead
+
                     LayeredInteractionResult(
                         newState = state.copy(selectedLayeredTileId = id),
                         soundToPlay = null,

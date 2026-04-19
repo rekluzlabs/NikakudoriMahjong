@@ -26,5 +26,5 @@ enum class Difficulty(
     NORMAL(7, 16, 5, "NORMAL", R.string.diff_normal),
     HARD(8, 17, 5, "HARD", R.string.diff_hard),
     EXTREME(8, 22, 5, "EXTREME", R.string.diff_extreme),
-    DEV(2, 2, 5, "DEV", -1)  // ← 4 tiles (2x2), secret test board
+    DEV(2, 2, 5, "DEV", -1)
 }

@@ -32,15 +32,14 @@ fun MenuPillButton(
     color: Color = SlateGrey,
     onClick: () -> Unit
 ) {
-    // Detects when the user is physically pressing the button
+
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    // Determine color based on state:
-    // Disabled = Dark, Pressed = Cyan Flash, Normal = Grey
+
     val buttonColor = when {
         !enabled -> Color(0xFF334455)
-        isPressed -> Color(0xFF00BFFF) // The "Light Up" color
+        isPressed -> Color(0xFF00BFFF)
         else -> color
     }
 
@@ -53,7 +52,7 @@ fun MenuPillButton(
             .clickable(
                 enabled = enabled,
                 interactionSource = interactionSource,
-                indication = null // Removes the standard grey ripple so our Cyan flash is clear
+                indication = null
             ) { onClick() },
         contentAlignment = Alignment.Center
     ) {

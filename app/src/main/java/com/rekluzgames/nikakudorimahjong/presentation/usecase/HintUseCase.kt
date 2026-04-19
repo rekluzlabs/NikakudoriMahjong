@@ -23,15 +23,13 @@ class HintUseCase @Inject constructor(
      * Does NOT handle autoComplete() — that stays in ViewModel.
      */
     fun applyFlatHint(state: GameUIState): GameUIState {
-        // Early returns: game state checks
+
         if (state.gameState != com.rekluzgames.nikakudorimahjong.domain.model.GameState.PLAYING) {
             return state
         }
 
-        // Mark hint as used
         var newState = state.copy(usedHint = true)
 
-        // If no hints cached, find them
         if (newState.allAvailableHints.isEmpty()) {
             val hints = HintFinder.findAllMatches(state.board)
             if (hints.isNotEmpty()) {
@@ -40,13 +38,13 @@ class HintUseCase @Inject constructor(
                     currentHintIndex = 0
                 )
             } else {
-                // No hints available → transition to NO_MOVES
+
                 newState = newState.copy(
                     gameState = com.rekluzgames.nikakudorimahjong.domain.model.GameState.NO_MOVES
                 )
             }
         } else {
-            // Cycle to next hint
+
             newState = newState.copy(
                 currentHintIndex = (newState.currentHintIndex + 1) % newState.allAvailableHints.size
             )
@@ -62,15 +60,13 @@ class HintUseCase @Inject constructor(
      * Does NOT handle autoComplete() — that stays in ViewModel.
      */
     fun applyLayeredHint(state: GameUIState): GameUIState {
-        // Early return: game state check
+
         if (state.gameState != com.rekluzgames.nikakudorimahjong.domain.model.GameState.PLAYING) {
             return state
         }
 
-        // Mark hint as used
         var newState = state.copy(usedHint = true)
 
-        // If no hints cached, find them
         if (newState.layeredHints.isEmpty()) {
             val hints = LayeredHintFinder.findAllMatches(state.layeredTiles, layeredEngine)
             if (hints.isNotEmpty()) {
@@ -79,13 +75,13 @@ class HintUseCase @Inject constructor(
                     currentLayeredHintIndex = 0
                 )
             } else {
-                // No hints available → transition to NO_MOVES
+
                 newState = newState.copy(
                     gameState = com.rekluzgames.nikakudorimahjong.domain.model.GameState.NO_MOVES
                 )
             }
         } else {
-            // Cycle to next hint
+
             newState = newState.copy(
                 currentLayeredHintIndex = (newState.currentLayeredHintIndex + 1) % newState.layeredHints.size
             )

@@ -15,7 +15,7 @@ import android.annotation.SuppressLint
 @SuppressLint("DiscouragedApi")
 @Singleton
 class SoundManager @Inject constructor(
-    // Added @param: to resolve the compiler warning
+
     @param:ApplicationContext private val context: Context
 ) {
     private var soundPool: SoundPool? = SoundPool.Builder().setMaxStreams(6).build()

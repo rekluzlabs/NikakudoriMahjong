@@ -10,7 +10,7 @@ import javax.inject.Singleton
 
 @Singleton
 class QuoteManager @Inject constructor() {
-    // Separate pool per language so switching languages mid-session works correctly
+
     private val pools = mutableMapOf<String, MutableList<String>>()
 
     fun next(language: String): String {

@@ -7,9 +7,9 @@
 package com.rekluzgames.nikakudorimahjong.domain.model
 
 data class BackgroundMetadata(
-    val resourceName: String,    // e.g., "bg_001"
-    val locationName: String,    // e.g., "Kyoto, Japan"
-    val description: String      // e.g., "Fushimi Inari Shrine"
+    val resourceName: String,
+    val locationName: String,
+    val description: String
 )
 
 object BackgroundLocations {

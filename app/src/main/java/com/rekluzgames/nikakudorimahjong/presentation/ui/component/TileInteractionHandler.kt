@@ -29,7 +29,6 @@ class TileInteractionHandler @Inject constructor(
             return Result(state)
         }
 
-        // First selection
         if (state.selectedTile == null) {
             return Result(
                 newState = state.copy(

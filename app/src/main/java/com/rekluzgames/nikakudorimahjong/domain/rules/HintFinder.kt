@@ -15,7 +15,6 @@ object HintFinder {
         val groups = Array(34) { IntArray(rows * cols) }
         val counts = IntArray(34)
 
-        // Build groups
         for (r in 0 until rows) {
             for (c in 0 until cols) {
                 val tile = board[r][c]
@@ -27,7 +26,6 @@ object HintFinder {
             }
         }
 
-        // 🔥 OPTIMIZATION: build once
         val intBoard = toIntBoard(board)
 
         for (type in 0 until 34) {

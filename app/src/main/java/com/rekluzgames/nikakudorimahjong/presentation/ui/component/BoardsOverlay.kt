@@ -35,7 +35,7 @@ fun BoardsOverlay(viewModel: GameViewModel) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(32.dp)
             ) {
-                // Left side: 2D Boards
+
                 Column(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -48,7 +48,6 @@ fun BoardsOverlay(viewModel: GameViewModel) {
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
-                    // 2x2 grid for 2D boards
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             val easyDiff = Difficulty.EASY
@@ -87,7 +86,6 @@ fun BoardsOverlay(viewModel: GameViewModel) {
                     }
                 }
 
-                // Right side: 3D Boards
                 Column(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -100,7 +98,6 @@ fun BoardsOverlay(viewModel: GameViewModel) {
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
-                    // 2x2 + 1 grid for 3D boards (5 total)
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             BoardSmallButton(

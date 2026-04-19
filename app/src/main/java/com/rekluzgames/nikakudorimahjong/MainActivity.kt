@@ -35,8 +35,8 @@ class MainActivity : ComponentActivity() {
     lateinit var preferenceManager: PreferenceManager
 
     override fun attachBaseContext(newBase: Context) {
-        // Hilt isn't ready yet at this point, so we build PreferenceManager
-        // manually here just for locale — this is intentional and correct.
+
+
         val prefs = PreferenceManager(newBase)
         val lang = prefs.getLanguage()
         if (lang.isNotEmpty()) {

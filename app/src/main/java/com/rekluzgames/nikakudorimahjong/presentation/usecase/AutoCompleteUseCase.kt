@@ -9,7 +9,6 @@ package com.rekluzgames.nikakudorimahjong.presentation.usecase
 import com.rekluzgames.nikakudorimahjong.domain.engine.GameEngine
 import com.rekluzgames.nikakudorimahjong.domain.engine.LayeredGameEngine
 import com.rekluzgames.nikakudorimahjong.domain.model.GameUIState
-import com.rekluzgames.nikakudorimahjong.domain.model.Tile
 import com.rekluzgames.nikakudorimahjong.domain.rules.HintFinder
 import com.rekluzgames.nikakudorimahjong.domain.rules.LayeredHintFinder
 import com.rekluzgames.nikakudorimahjong.domain.rules.PathFinder
@@ -23,8 +22,8 @@ data class AutoCompleteStep(
     val newState: GameUIState,
     val matchPath: List<Pair<Int, Int>>,
     val pair: Pair<Pair<Int, Int>, Pair<Int, Int>>,
-    val shouldContinue: Boolean,  // false if no more matches
-    val isGameOver: Boolean        // true if all tiles removed
+    val shouldContinue: Boolean,
+    val isGameOver: Boolean
 )
 
 data class LayeredAutoCompleteStep(
@@ -49,26 +48,23 @@ class AutoCompleteUseCase @Inject constructor(
      * - attemptMatch fails
      */
     fun performFlatStep(state: GameUIState): AutoCompleteStep? {
-        // Early guard
+
         if (!state.canFinish) return null
 
         val board = state.board
         val matches = HintFinder.findAllMatches(board)
 
         if (matches.isEmpty()) {
-            return null  // No more moves
+            return null
         }
 
         val (p1, p2) = matches.first()
         val path = PathFinder.getPath(p1, p2, board) ?: listOf(p1, p2)
 
-        // Attempt the match
         val matchedBoard = engine.attemptMatch(p1, p2, board) ?: return null
 
-        // Check if game is over
         val isGameOver = engine.isGameOver(matchedBoard)
 
-        // Build next state
         val newState = state.copy(
             board = matchedBoard,
             selectedTile = null,

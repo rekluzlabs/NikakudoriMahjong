@@ -93,7 +93,7 @@ fun TileView(
                 .graphicsLayer {
                     scaleX = animatedScale
                     scaleY = animatedScale
-                    // REMOVED: Global alpha here was making it too invisible
+
                 }
                 .clickable(enabled = !isBlocked) { onClick() },
             contentAlignment = Alignment.TopStart
@@ -111,8 +111,7 @@ fun TileView(
                 )
             }
 
-            // BLOCKED OVERLAY
-            // Reduced alpha to 0.25f so the tile face is still clearly visible but looks "receded"
+
             if (isBlocked) {
                 Box(
                     Modifier
@@ -122,7 +121,6 @@ fun TileView(
                 )
             }
 
-            // SELECTION OVERLAY
             if (isSelected) {
                 Box(
                     Modifier
@@ -133,7 +131,6 @@ fun TileView(
                 )
             }
 
-            // HINT OVERLAY
             if (isHinted) {
                 Box(
                     Modifier

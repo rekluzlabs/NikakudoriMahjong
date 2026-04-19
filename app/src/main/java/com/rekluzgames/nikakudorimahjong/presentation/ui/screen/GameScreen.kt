@@ -55,7 +55,6 @@ fun GameScreen(
     var showLanguageOverlay by remember { mutableStateOf(false) }
     var showQuoteOverlay by remember { mutableStateOf(false) }
 
-    // --- ZOOM & PAN STATE ---
     var scale by remember { mutableStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
 
@@ -94,7 +93,7 @@ fun GameScreen(
                     .fillMaxSize()
                     .padding(8.dp)
             ) {
-                // 1. GAME BOARD AREA (Left Side)
+
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -102,7 +101,7 @@ fun GameScreen(
                         .clipToBounds(),
                     contentAlignment = Alignment.Center
                 ) {
-                    // LAYER A: Static Background
+
                     val isDimmed = uiState.gameState == GameState.PLAYING
                     val backgroundAlpha by animateFloatAsState(
                         targetValue = if (isDimmed) 0.3f else 1f,
@@ -123,7 +122,6 @@ fun GameScreen(
                         )
                     }
 
-                    // LAYER B: Location Overlay (displays location text on image)
                     if (uiState.gameState == GameState.WON ||
                         uiState.gameState == GameState.SCORE ||
                         uiState.gameState == GameState.SCORE_ENTRY ||
@@ -131,8 +129,7 @@ fun GameScreen(
                         LocationOverlay(backgroundImageName = uiState.backgroundImageName)
                     }
 
-                    // Reset zoom & pan immediately when zoom is disabled so the
-                    // board never stays stuck in a zoomed-in state after toggle.
+
                     LaunchedEffect(settingsState.isZoomEnabled) {
                         if (!settingsState.isZoomEnabled) {
                             scale = 1f
@@ -140,22 +137,21 @@ fun GameScreen(
                         }
                     }
 
-                    // LAYER C: Zoomable Board
-                    // Single unified pointerInput block handles double-tap reset,
-                    // zoom, and pan. Using one block avoids pointer-input collision
-                    // where competing modifiers fight over the same touch stream.
-                    //
-                    // Double-tap strategy: record timestamp on pointer UP (not down).
-                    // This matches how the Android View system's GestureDetector works
-                    // and avoids the edge case of triggering a reset while the finger
-                    // is still held on the second tap press.
-                    //
-                    // Position check: both taps must land within doubleTapSlop of each
-                    // other. This prevents two fast tile selections on different tiles
-                    // from being mistaken for a double-tap reset.
-                    //
-                    // isZoomEnabled is the pointerInput key so the gesture handler
-                    // restarts cleanly whenever the setting changes.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -163,22 +159,20 @@ fun GameScreen(
                                 val touchSlop    = viewConfiguration.touchSlop
                                 val doubleTapTimeout = viewConfiguration.doubleTapTimeoutMillis
 
-                                // Tracks the time and position of the last confirmed tap-up.
-                                // Both are required to distinguish a double-tap-to-reset
-                                // from two fast tile selections on different tiles.
-                                // Declared outside awaitEachGesture so they persist
-                                // across gesture cycles.
+
+
+
+
                                 var lastTapUpTime     = 0L
                                 var lastTapUpPosition = Offset.Zero
 
-                                // How far apart two taps can be and still count as a
-                                // double-tap. Using 2× touchSlop gives ~16dp of tolerance,
-                                // matching Android's own DoubleTapSlop constant.
+
+
                                 val doubleTapSlop = touchSlop * 2
 
                                 awaitEachGesture {
-                                    // Wait for first finger down on the Initial pass so we
-                                    // intercept before the tile grid sees the event.
+
+
                                     val down         = awaitFirstDown(pass = PointerEventPass.Initial)
                                     val downPosition = down.position
 
@@ -193,9 +187,8 @@ fun GameScreen(
 
                                         val allUp = event.changes.all { !it.pressed }
 
-                                        // Only apply zoom/pan transforms when the feature
-                                        // is enabled. The gesture loop still runs when
-                                        // disabled so single taps pass through normally.
+
+
                                         if (settingsState.isZoomEnabled) {
                                             if (!isTransforming &&
                                                 (zoom != 1f || totalPan.getDistance() > touchSlop)
@@ -204,20 +197,19 @@ fun GameScreen(
                                             }
 
                                             if (isTransforming) {
-                                                // Apply zoom, clamped between 1× and 3×.
+
                                                 scale = (scale * zoom).coerceIn(1f, 3f)
                                                 offset = if (scale > 1f) offset + pan else Offset.Zero
-                                                // Consume so tiles don't receive pan/zoom events.
+
                                                 event.changes.forEach { it.consume() }
                                             }
                                         }
 
-                                        // All fingers lifted — evaluate double-tap on UP.
-                                        // Checking on UP (not down) is critical:
-                                        //   • The tile's click handler fires on up, so consuming
-                                        //     here still suppresses the spurious tile click.
-                                        //   • We never consume a down that hasn't fully resolved,
-                                        //     so single taps flow through to tiles with zero delay.
+
+
+
+
+
                                         if (allUp && !isTransforming) {
                                             val now  = System.currentTimeMillis()
                                             val dist = (downPosition - lastTapUpPosition).getDistance()
@@ -225,21 +217,21 @@ fun GameScreen(
                                             val isWithinSpace = dist < doubleTapSlop
 
                                             if (settingsState.isZoomEnabled && isWithinTime && isWithinSpace) {
-                                                // Confirmed double-tap on roughly the same spot:
-                                                // reset zoom & pan.
+
+
                                                 scale  = 1f
                                                 offset = Offset.Zero
-                                                // Consume this up-event so the tile grid does not
-                                                // register it as a tile selection.
+
+
                                                 event.changes.forEach { it.consume() }
-                                                // Prevent triple-tap from triggering again.
+
                                                 lastTapUpTime = 0L
                                             } else {
-                                                // Either too slow, too far apart, or zoom is
-                                                // disabled — treat as a fresh first tap.
-                                                // Do NOT consume — let it fall through to the
-                                                // tile grid on the Main pass so tile selection
-                                                // works with zero latency.
+
+
+
+
+
                                                 lastTapUpTime     = now
                                                 lastTapUpPosition = downPosition
                                             }
@@ -264,9 +256,8 @@ fun GameScreen(
                             onLayeredTileClick = { id -> viewModel.handleLayeredTileClick(id) }
                         )
                     }
-                } // End Game Board Area Box
+                }
 
-                // 2. SIDE MENU (Right Side)
                 Column(
                     modifier = Modifier
                         .padding(start = 8.dp)
@@ -323,11 +314,10 @@ fun GameScreen(
                     }
                     TimerDisplay(viewModel = viewModel)
                 }
-            } // End Row
+            }
 
-            // ===================================================================
-            // DEV MENU OVERLAY
-            // ===================================================================
+
+
             if (isDevMenuOpen) {
                 DevMenu(
                     gameViewModel = viewModel,
@@ -335,9 +325,8 @@ fun GameScreen(
                 )
             }
 
-            // ===================================================================
-            // GAME STATE OVERLAYS
-            // ===================================================================
+
+
             when (uiState.gameState) {
                 GameState.PAUSED      -> PauseOverlay(viewModel) { (context as? Activity)?.finish() }
                 GameState.BOARDS      -> BoardsOverlay(viewModel)

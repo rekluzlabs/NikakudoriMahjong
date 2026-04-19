@@ -37,7 +37,6 @@ fun SettingsOverlay(
     val settingsState by settingsViewModel.uiState.collectAsState()
     val gameState by gameViewModel.uiState.collectAsState()
 
-    // Sync the layered flag from game state each time this overlay opens
     LaunchedEffect(Unit) {
         settingsViewModel.syncLayeredMode(gameState.isLayeredMode)
     }
@@ -48,10 +47,8 @@ fun SettingsOverlay(
 
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
-                // ── Row 1: [Mode | Board] | [Sound | Vibration | Zoom] ───────
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
 
-                    // Mode + Board type
                     Row(
                         modifier = Modifier.weight(1f),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -74,7 +71,6 @@ fun SettingsOverlay(
                         ) { settingsViewModel.toggleBoardType() }
                     }
 
-                    // Sound + Vibration (restored to 2 buttons)
                     Row(
                         modifier = Modifier.weight(1f),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -101,7 +97,6 @@ fun SettingsOverlay(
                     }
                 }
 
-                // ── Row 2: [Screen + Zoom] | [Music + Scores] ────────────────
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     Row(
                         modifier = Modifier.weight(1f),
@@ -131,7 +126,7 @@ fun SettingsOverlay(
                                 currentDifficulty = gameViewModel.uiState.value.difficulty,
                                 isLayeredMode     = settingsState.isLayeredMode
                             )
-                            // Language overlay is shown from GameScreen via callback
+
                             onShowLanguage()
                         }
                     }
