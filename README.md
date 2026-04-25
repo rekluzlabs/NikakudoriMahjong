@@ -1,7 +1,7 @@
 
 
 # Nikakudori Mahjong
-Copyright (c) 2026 Rekluz Games. All rights reserved.
+
 <p align="center">  
 <img width="550" height="250" alt="gameplay1" src="https://github.com/user-attachments/assets/2fe81263-8203-4ff5-9f47-5510433dffb4" />
 </p>
