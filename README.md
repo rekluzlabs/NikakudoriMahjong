@@ -46,6 +46,8 @@ Fixed some game board glitches
 - **Visual Effects:** Animated connections, more features on the way
 - **No Ads or Tracking:** Clean, stress-free gameplay
 
+sign up to be notified when the game goes live on the Google Play store at https://rekluzlabs.github.io
+
 ## License
 
 *Copyright © 2026 Rekluz Labs. All rights reserved.*
