@@ -46,7 +46,8 @@ Fixed some game board glitches
 - **Visual Effects:** Animated connections, more features on the way
 - **No Ads or Tracking:** Clean, stress-free gameplay
 
-sign up to be notified when the game goes live on the Google Play store at https://rekluzlabs.github.io
+Nikakudori Mahjong is now in the Playstore.
+Download it today! (https://play.google.com/store/apps/details?id=com.rekluzlabs.nikaku_dori_mahjong)
 
 ## License
 
