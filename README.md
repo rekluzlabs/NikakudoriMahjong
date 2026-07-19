@@ -52,5 +52,5 @@ Download it today! (https://play.google.com/store/apps/details?id=com.rekluzlabs
 ## License
 
 *Copyright © 2026 Rekluz Labs. All rights reserved.*
-*This code and its assets are the exclusive property of Rekluz Games.
+*This code and its assets are the exclusive property of Rekluz Labs.
 *Personal use only. No commercial use or redistribution permitted.*
