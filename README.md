@@ -12,7 +12,7 @@ A beautiful and peaceful Japanese tile-matching solitaire game. Clear the board 
 
 
 ## Nikakudori Mahjong is now in the Playstore.
-## Download it today! (https://play.google.com/store/apps/details?id=com.rekluzlabs.nikaku_dori_mahjong)
+<a class="product-status is-live" href="[https://play.google.com/store/apps/details?id=com.rekluzlabs.makorevive](https://play.google.com/store/apps/details?id=com.rekluzlabs.nikaku_dori_mahjong)" target="_blank" rel="noopener">View on Google Play</a>
 
 Redesigned Board Layouts 
 Audio and Visual effects
